@@ -22,7 +22,7 @@ def write_config(data: dict):
         print(f"Unable to write to the config file: {repr(err)}")
 
 
-def get_new_article() -> str:
+def get_new_article() -> [str, bool]:
     response = requests.get(url=archive_url)
     data = response.content
 
@@ -31,9 +31,11 @@ def get_new_article() -> str:
     if last_article == config.get('LAST_URL'):
         print("No new article is found, getting a random one...")
         last_article = get_random_article_url()
+        from_archive = False
     else:
         print(f"Last article is {last_article}")
-    return last_article
+        from_archive = True
+    return last_article, from_archive
 
 
 def get_random_article_url():
@@ -52,7 +54,7 @@ def send_tg_message(token='', chat_id=0, message='') -> bool:
 
 try_counter = 0
 config = read_config()
-new_article = get_new_article()
+new_article, article_is_from_archive = get_new_article()
 
 while try_counter < 5:
     try_counter += 1
@@ -61,8 +63,9 @@ while try_counter < 5:
     send_result = send_tg_message(token=config.get('BOT_TOKEN', ''), chat_id=config.get('CHAT_ID', 0), message=new_article)
     print("Message is sent" if send_result else "Something is wrong")
     if send_result:
-        config.update({'LAST_URL': new_article})
-        write_config(config)
+        if article_is_from_archive:
+            config.update({'LAST_URL': new_article})
+            write_config(config)
         break
 
 print("Script is finished")
