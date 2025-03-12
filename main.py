@@ -3,7 +3,7 @@ import requests, bs4, yaml
 def read_config() -> dict:
     config_data = {}
     try:
-        with open('config.yaml') as f:
+        with open('./config.yaml') as f:
             config_data = yaml.safe_load(f)
     except Exception as err:
         print(f"Unable to read the config file: {repr(err)}")
