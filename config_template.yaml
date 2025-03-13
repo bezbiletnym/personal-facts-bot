@@ -1,3 +1,5 @@
 BOT_TOKEN: ''
 CHAT_ID: 0
+ARCHIVE_URL: https://nowiknow.com/archives/
+RANDOM_URL: http://nowiknow.com/?random
 LAST_URL: ''
