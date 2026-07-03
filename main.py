@@ -62,8 +62,7 @@ def send_tg_message(token: str, chat_id: int, article: Article) -> bool:
     return response.ok
 
 
-DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
-CONFIG_FILE = os.path.join(DATA_DIR, "config.yaml")
+CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "config.yaml")
 dotenv.load_dotenv()
 try_counter = 0
 config = read_config()
