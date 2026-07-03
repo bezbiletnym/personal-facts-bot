@@ -1,7 +1,6 @@
 import requests, bs4, yaml, os
 from classes.article import Article
-
-config_path = './config.yaml'
+import dotenv
 
 def read_config() -> dict:
     config_data = {}
@@ -11,10 +10,8 @@ def read_config() -> dict:
             f.close()
     except Exception as err:
         print(f"Unable to read the config file: {repr(err)}")
-    if config_data:
-        for key, value in config_data.items():
-            os.environ[key] = str(value)
     return config_data
+
 
 def write_config(data: dict):
     try:
@@ -25,14 +22,13 @@ def write_config(data: dict):
         print(f"Unable to write to the config file: {repr(err)}")
 
 
-
 def get_new_article() -> Article:
-    response = requests.get(url=os.environ.get('ARCHIVE_URL', ''))
+    response = requests.get(url=config.get('ARCHIVE_URL', ''))
     data = response.content
 
     soup = bs4.BeautifulSoup(markup=data, features="html.parser")
     last_article_url = soup.find(name='article').a['href']
-    if last_article_url == os.environ.get('LAST_URL'):
+    if last_article_url == config.get('LAST_URL'):
         print("No new article is found, getting a random one...")
         last_article_url = get_random_article_url()
         is_from_archive = False
@@ -44,7 +40,7 @@ def get_new_article() -> Article:
 
 
 def get_random_article_url():
-    response = requests.get(url=os.environ.get('RANDOM_URL', ''))
+    response = requests.get(url=config.get('RANDOM_URL', ''))
     return response.links.get('shortlink', {}).get('url', '')
 
 
@@ -66,6 +62,8 @@ def send_tg_message(token: str, chat_id: int, article: Article) -> bool:
     return response.ok
 
 
+config_path = './config.yaml'
+dotenv.load_dotenv()
 try_counter = 0
 config = read_config()
 new_article = get_new_article()
