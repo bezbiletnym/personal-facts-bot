@@ -4,3 +4,4 @@ I love interesting facts, but I don't like to browse websites from my phone.
 So I made this little project to send articles from https://nowiknow.com/ to my Telegram account through a chatbot API.
 
 Main script is searching for a *config.yaml* file. So before launching the script you need to fill in *BOT_TOKEN* and *CHAT_ID* fields in *config_template.yaml* and rename it.
+Or you can just add all the fields to your env variables.

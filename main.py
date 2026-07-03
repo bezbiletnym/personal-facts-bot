@@ -20,10 +20,10 @@ def write_config(data: dict):
     try:
        with open(file=config_path, mode='w') as f:
            yaml.safe_dump(data=data, stream=f)
+           f.close()
     except Exception as err:
         print(f"Unable to write to the config file: {repr(err)}")
-    finally:
-        f.close()
+
 
 
 def get_new_article() -> Article:
