@@ -5,7 +5,7 @@ import dotenv
 def read_config() -> dict:
     config_data = {}
     try:
-        with open(file=CONFIG_FILE) as f:
+        with open(file=BUNDLED_CONFIG_FILE) as f:
             config_data = yaml.safe_load(f)
             f.close()
     except Exception as err:
@@ -62,6 +62,12 @@ def send_tg_message(token: str, chat_id: int, article: Article) -> bool:
     return response.ok
 
 
+# BUNDLED_CONFIG_FILE resolves to data/config.yaml relative to this script,
+# which is always present in the repo image and is not affected by the volume
+# mount at /app/data. Used for reading the initial config.
+BUNDLED_CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "config.yaml")
+# DATA_DIR / CONFIG_FILE point to the volume-mounted path, used for writing
+# updated state (e.g. LAST_URL) so it persists across cron runs.
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 CONFIG_FILE = os.path.join(DATA_DIR, "config.yaml")
 dotenv.load_dotenv()
