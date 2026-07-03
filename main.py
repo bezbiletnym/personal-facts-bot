@@ -62,7 +62,7 @@ def send_tg_message(token: str, chat_id: int, article: Article) -> bool:
     return response.ok
 
 
-config_path = './config.yaml'
+config_path = 'data/config.yaml'
 dotenv.load_dotenv()
 try_counter = 0
 config = read_config()
