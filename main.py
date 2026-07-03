@@ -1,4 +1,4 @@
-import requests, bs4, yaml, os
+import requests, bs4, yaml, os, shutil
 from classes.article import Article
 import dotenv
 
@@ -64,6 +64,14 @@ def send_tg_message(token: str, chat_id: int, article: Article) -> bool:
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 CONFIG_FILE = os.path.join(DATA_DIR, "config.yaml")
+BUNDLED_CONFIG = os.path.join(os.path.dirname(__file__), "config.yaml.default")
+
+if not os.path.exists(CONFIG_FILE):
+    print("Config file not found in volume, copying bundled default...")
+    os.makedirs(DATA_DIR, exist_ok=True)
+    shutil.copy(BUNDLED_CONFIG, CONFIG_FILE)
+    print(f"Copied default config to {CONFIG_FILE}")
+
 dotenv.load_dotenv()
 try_counter = 0
 config = read_config()
