@@ -5,7 +5,7 @@ import dotenv
 def read_config() -> dict:
     config_data = {}
     try:
-        with open(file=config_path) as f:
+        with open(file=CONFIG_FILE) as f:
             config_data = yaml.safe_load(f)
             f.close()
     except Exception as err:
@@ -15,7 +15,7 @@ def read_config() -> dict:
 
 def write_config(data: dict):
     try:
-       with open(file=config_path, mode='w') as f:
+       with open(file=CONFIG_FILE, mode='w') as f:
            yaml.safe_dump(data=data, stream=f)
            f.close()
     except Exception as err:
@@ -62,7 +62,8 @@ def send_tg_message(token: str, chat_id: int, article: Article) -> bool:
     return response.ok
 
 
-config_path = 'data/config.yaml'
+DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
+CONFIG_FILE = os.path.join(DATA_DIR, "config.yaml")
 dotenv.load_dotenv()
 try_counter = 0
 config = read_config()
