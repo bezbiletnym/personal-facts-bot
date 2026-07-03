@@ -3,21 +3,14 @@ from classes.article import Article
 
 config_path = './config.yaml'
 
-
-def load_data_to_env(data: dict):
-    if data:
-        for key, value in data.items():
-            os.environ[key] = str(value)
-
 def read_config() -> dict:
     config_data = {}
     try:
         with open(file=config_path) as f:
             config_data = yaml.safe_load(f)
+            f.close()
     except Exception as err:
         print(f"Unable to read the config file: {repr(err)}")
-    finally:
-        f.close()
     if config_data:
         for key, value in config_data.items():
             os.environ[key] = str(value)
@@ -26,7 +19,7 @@ def read_config() -> dict:
 def write_config(data: dict):
     try:
        with open(file=config_path, mode='w') as f:
-           yaml.dump(data=data, stream=f)
+           yaml.safe_dump(data=data, stream=f)
     except Exception as err:
         print(f"Unable to write to the config file: {repr(err)}")
     finally:
