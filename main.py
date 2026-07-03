@@ -2,33 +2,34 @@ import requests, bs4, yaml, os
 from classes.article import Article
 import dotenv
 
-def read_config() -> dict:
-    config_data = {}
+def get_last_url() -> str:
+    url = ''
     try:
-        with open(file=CONFIG_FILE) as f:
-            config_data = yaml.safe_load(f)
+        with open(file=LAST_URL_FILE) as f:
+            file_data = yaml.safe_load(f)
             f.close()
+            url = file_data.get('LAST_URL', '')
     except Exception as err:
-        print(f"Unable to read the config file: {repr(err)}")
-    return config_data
+        print(f"Unable to read last_url file: {repr(err)}")
+    return url
 
 
-def write_config(data: dict):
+def write_last_url(url: str):
     try:
-       with open(file=CONFIG_FILE, mode='w') as f:
-           yaml.safe_dump(data=data, stream=f)
+       with open(file=LAST_URL_FILE, mode='w') as f:
+           yaml.safe_dump(data={'LAST_URL': url}, stream=f)
            f.close()
     except Exception as err:
-        print(f"Unable to write to the config file: {repr(err)}")
+        print(f"Unable to write to last_url file: {repr(err)}")
 
 
 def get_new_article() -> Article:
-    response = requests.get(url=config.get('ARCHIVE_URL', ''))
+    response = requests.get(url=ARCHIVE_URL)
     data = response.content
 
     soup = bs4.BeautifulSoup(markup=data, features="html.parser")
     last_article_url = soup.find(name='article').a['href']
-    if last_article_url == config.get('LAST_URL'):
+    if last_article_url == last_url:
         print("No new article is found, getting a random one...")
         last_article_url = get_random_article_url()
         is_from_archive = False
@@ -40,7 +41,7 @@ def get_new_article() -> Article:
 
 
 def get_random_article_url():
-    response = requests.get(url=config.get('RANDOM_URL', ''))
+    response = requests.get(url=RANDOM_URL)
     return response.links.get('shortlink', {}).get('url', '')
 
 
@@ -62,10 +63,12 @@ def send_tg_message(token: str, chat_id: int, article: Article) -> bool:
     return response.ok
 
 
-CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "config.yaml")
+ARCHIVE_URL='https://nowiknow.com/archives/'
+RANDOM_URL='https://nowiknow.com/?random'
+LAST_URL_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "last_url.yaml")
 dotenv.load_dotenv()
 try_counter = 0
-config = read_config()
+last_url = get_last_url()
 new_article = get_new_article()
 
 while try_counter < 5:
@@ -76,8 +79,7 @@ while try_counter < 5:
     print("Message is sent" if send_result else "Something is wrong")
     if send_result:
         if new_article.is_from_archive:
-            config.update({'LAST_URL': new_article.url})
-            write_config(config)
+            write_last_url(new_article.url)
         break
 
 print("Script is finished")
